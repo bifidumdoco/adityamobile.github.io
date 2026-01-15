@@ -77,9 +77,39 @@
             transform: scale(0.95);
         }
     </style>
+    <style>
+        /* Landscape Warning Overlay */
+        #rotate-warning {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #111;
+            /* Darker for Navy */
+            z-index: 9999;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            text-align: center;
+        }
+
+        @media screen and (orientation: portrait) {
+            #rotate-warning {
+                display: flex;
+            }
+        }
+    </style>
 </head>
 
 <body>
+    <div id="rotate-warning">
+        <div style="font-size: 64px; margin-bottom: 20px;">📱➡️</div>
+        <h2>Captain! Rotate Your Device</h2>
+        <p>Ideally functionality is optimized for Landscape</p>
+    </div>
     <div id="ui-layer">
         <!-- 1. LOADING -->
         <div id="loading-screen">

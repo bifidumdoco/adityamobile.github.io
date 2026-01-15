@@ -369,9 +369,38 @@
             font-size: 18px;
         }
     </style>
+    <style>
+        /* Landscape Warning Overlay */
+        #rotate-warning {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 9999;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            text-align: center;
+        }
+
+        @media screen and (orientation: portrait) {
+            #rotate-warning {
+                display: flex;
+            }
+        }
+    </style>
 </head>
 
 <body>
+    <div id="rotate-warning">
+        <i class="fas fa-mobile-alt" style="font-size: 64px; transform: rotate(-90deg); margin-bottom: 20px;"></i>
+        <h2>Please Rotate Your Device</h2>
+        <p>This game requires Landscape Mode</p>
+    </div>
 
     <div id="start-screen">
         <h1>ADITYA'S WESTERN WORLD</h1>
@@ -737,7 +766,7 @@
 
             // --- MOBILE CONTROLS ---
             function initMobileControls() {
-                document.getElementById('mobile-controls').style.display = 'block';
+                // UI shows only after start
                 document.getElementById('interaction-prompt').style.bottom = '40%'; // Move prompt up
 
                 // 1. Joystick
@@ -781,7 +810,7 @@
                     const deltaY = touchY - lastTouchY;
 
                     // Adjust sensitivity as needed
-                    const sensitivity = 0.005;
+                    const sensitivity = 0.002;
                     camera.rotation.y -= deltaX * sensitivity;
                     camera.rotation.x -= deltaY * sensitivity;
                     // Clamp look up/down
@@ -818,6 +847,7 @@
                 startBtn.onclick = (e) => {
                     e.preventDefault();
                     document.getElementById('start-screen').style.display = 'none';
+                    document.getElementById('mobile-controls').style.display = 'block'; // SHOW UI NOW
                     isGameStarted = true;
                     audioManager.init();
                 };
@@ -1597,7 +1627,8 @@
                 const time = performance.now();
                 const delta = (time - prevTime) / 1000;
 
-                if (controls.isLocked) {
+                const isMobile = ('ontouchstart' in window || navigator.maxTouchPoints > 0);
+                if (controls.isLocked || (isMobile && isGameStarted && !isModalOpen)) {
                     const targetSpeed = isRunning ? RUN_SPEED : BASE_SPEED;
                     const targetFOV = isRunning ? RUN_FOV : BASE_FOV;
                     if (camera.fov !== targetFOV) {

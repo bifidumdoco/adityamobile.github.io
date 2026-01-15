@@ -14,7 +14,10 @@ class Game {
         this.ships = [];
         this.input = new InputController();
         this.cameraController = null;
+        this.input = new InputController();
         this.cameraController = null;
+        this.cameraController = null;
+        this.isMobile = false;
         this.ocean = null;
         this.assets = {}; // Store loaded GLB models
 
@@ -229,6 +232,13 @@ class Game {
         // Audio Transition
         if (this.menuMusic && this.menuMusic.isPlaying) this.menuMusic.stop();
         if (this.engineSound) this.engineSound.play();
+
+        if (this.engineSound) this.engineSound.play();
+
+        // Show Mobile UI if applicable
+        if (this.isMobile) {
+            document.getElementById('mobile-ui').style.display = 'block';
+        }
 
         // Request Lock
         document.body.requestPointerLock();
@@ -615,7 +625,8 @@ class Game {
     }
 
     setupMobileControls() {
-        document.getElementById('mobile-ui').style.display = 'block';
+        // Just init logic, show it in startGame
+        this.isMobile = true;
 
         // 1. Joystick (Throttle/Rudder)
         // W/S = Throttle, A/D = Rudder
