@@ -779,13 +779,19 @@
                 });
 
                 joystickManager.on('move', function (evt, data) {
+                    if (!data.vector) return;
+                    // Standard Nipple.js: vector x/y are normalized.
+                    // y > 0 is UP (forward), y < 0 is DOWN (backward)
+                    // x > 0 is RIGHT, x < 0 is LEFT
+
                     const forward = data.vector.y;
                     const turn = data.vector.x;
 
-                    if (forward > 0.5) moveForward = true; else moveForward = false;
-                    if (forward < -0.5) moveBackward = true; else moveBackward = false;
-                    if (turn > 0.5) moveRight = true; else moveRight = false;
-                    if (turn < -0.5) moveLeft = true; else moveLeft = false;
+                    // Thresholds
+                    if (forward > 0.3) moveForward = true; else moveForward = false;
+                    if (forward < -0.3) moveBackward = true; else moveBackward = false;
+                    if (turn > 0.3) moveRight = true; else moveRight = false;
+                    if (turn < -0.3) moveLeft = true; else moveLeft = false;
                 });
 
                 joystickManager.on('end', function () {
@@ -812,8 +818,9 @@
 
                     // Adjust sensitivity as needed
                     const sensitivity = 0.002;
-                    camera.rotation.y -= deltaX * sensitivity;
-                    camera.rotation.x -= deltaY * sensitivity;
+                    camera.rotation.y -= deltaX * sensitivity; // Left/Right
+                    camera.rotation.x += deltaY * sensitivity; // FIX: Invert Look (Drag Up -> Look Up)
+
                     // Clamp look up/down
                     camera.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, camera.rotation.x));
 
