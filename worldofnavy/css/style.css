@@ -42,15 +42,15 @@ h2 {
 }
 
 button {
-    padding: 15px 30px;
-    font-size: 20px;
+    padding: 2vmin 4vmin;
+    font-size: 3.5vmin;
     background: #0074D9;
     color: white;
     border: 2px solid #0056b3;
     border-radius: 5px;
     cursor: pointer;
     transition: all 0.2s;
-    margin: 10px;
+    margin: 1vmin;
     pointer-events: auto;
 }
 
@@ -80,7 +80,7 @@ button:hover {
 #ship-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
+    gap: 2vmin;
     max-width: 800px;
     width: 90%;
 }
@@ -102,7 +102,7 @@ button:hover {
 }
 
 .ship-name {
-    font-size: 18px;
+    font-size: 3vmin;
     font-weight: bold;
 }
 
@@ -150,11 +150,11 @@ button:hover {
 }
 
 #match-timer {
-    font-size: 24px;
+    font-size: 4vmin;
     font-weight: bold;
     text-shadow: 2px 2px 4px black;
     background: rgba(0, 0, 0, 0.5);
-    padding: 5px 15px;
+    padding: 1vmin 3vmin;
     border-radius: 15px;
 }
 
@@ -186,19 +186,19 @@ button:hover {
 
 #player-status {
     position: absolute;
-    bottom: 20px;
+    bottom: 5vh;
     left: 20px;
     background: rgba(0, 0, 0, 0.6);
-    padding: 15px;
+    padding: 2vmin;
     border-radius: 10px;
-    width: 300px;
+    width: 35vw;
 }
 
 .status-row {
-    margin-bottom: 10px;
+    margin-bottom: 1vmin;
     display: flex;
     align-items: center;
-    font-size: 18px;
+    font-size: 3vmin;
 }
 
 .hp-bar-container {
@@ -228,5 +228,5 @@ button:hover {
 /* Game Over */
 #game-over h1 {
     color: #ffdc00;
-    font-size: 48px;
+    font-size: 8vmin;
 }
