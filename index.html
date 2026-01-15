@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Aditya's Android 15 Portfolio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Sans (via local proxy or similar font) - Using Quicksand/Product Sans alternative for demo -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            /* Material 3 Token Simulation - Light Blue Theme */
+            --md-sys-color-primary: #005ac1;
+            --md-sys-color-on-primary: #ffffff;
+            --md-sys-color-primary-container: #d8e2ff;
+            --md-sys-color-on-primary-container: #001a41;
+            --md-sys-color-surface: #f8f9fa;
+            /* Light Grayish White */
+            --md-sys-color-on-surface: #1e293b;
+            /* Slate 800 */
+            --md-sys-color-surface-variant: #e2e8f0;
+            --md-sys-color-on-surface-variant: #475569;
+            --md-sys-color-outline: #74777f;
+
+            --md-sys-shape-corner-extra-large: 28px;
+            --md-sys-shape-corner-full: 9999px;
+
+            --wallpaper-overlay: rgba(0, 0, 0, 0.2);
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow: hidden;
+            background-color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            user-select: none;
+        }
+
+        /* Phone Container (Pixel 8ish Bezel) */
+        #phone-bezel {
+            width: 380px;
+            height: 820px;
+            background: #101010;
+            border-radius: 54px;
+            box-shadow: 0 0 0 4px #333, 0 0 50px rgba(0, 0, 0, 0.5);
+            position: relative;
+            padding: 12px;
+            box-sizing: border-box;
+            border: 2px solid #222;
+        }
+
+        #screen {
+            width: 100%;
+            height: 100%;
+            background: url('images/wallpaper-v2.jpg') no-repeat center center;
+            background-size: cover;
+            border-radius: 42px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Wallpaper Overlay */
+        #screen::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.3));
+            pointer-events: none;
+        }
+
+        /* Status Bar */
+        #status-bar {
+            height: 44px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 24px;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            z-index: 50;
+            position: relative;
+        }
+
+        /* At A Glance Widget */
+        #at-a-glance {
+            padding: 16px 24px;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            position: relative;
+            margin-top: 20px;
+        }
+
+        /* Apps Grid */
+        #apps-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px 12px;
+            padding: 0 16px;
+            margin-top: auto;
+            margin-bottom: 24px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .app-icon {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            transition: transform 0.1s cubic-bezier(0.2, 0, 0, 1);
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .app-icon:active {
+            transform: scale(0.92);
+        }
+
+        .icon-bg {
+            width: 62px;
+            height: 62px;
+            border-radius: 22px;
+            /* Squircle */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            color: white;
+            /* Icons are white on gradients */
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            position: relative;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            /* Bouncy */
+            border: 2px solid rgba(255, 255, 255, 0.4);
+        }
+
+        .app-icon:hover .icon-bg {
+            transform: scale(1.1) rotate(-4deg);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+        }
+
+        .app-icon:active .icon-bg {
+            transform: scale(0.95);
+        }
+
+        /* Themed Icon Variant */
+        .themed-icon {
+            background-color: #d3e3fd;
+            color: #003355;
+        }
+
+        .app-label {
+            color: white;
+            font-size: 12px;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+
+        /* Bottom Row (Favorites/Dock) & Search */
+        #bottom-area {
+            padding: 0 16px 24px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            position: relative;
+            z-index: 10;
+        }
+
+        #dock {
+            display: flex;
+            justify-content: space-between;
+            padding: 0 8px;
+        }
+
+        /* Updated Search Bar for Top placement */
+        #search-bar {
+            background: rgba(30, 30, 30, 0.85);
+            backdrop-filter: blur(10px);
+            height: 56px;
+            border-radius: 28px;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            margin: 16px 20px 0 20px;
+            cursor: pointer;
+            z-index: 20;
+        }
+
+        /* 3-Button Nav */
+        #nav-buttons button {
+            transition: all 0.2s;
+        }
+
+        #nav-buttons button:active {
+            transform: scale(0.9);
+            opacity: 1;
+        }
+
+        /* App Windows (Material 3) */
+        .app-window {
+            position: absolute;
+            inset: 0;
+            background: var(--md-sys-color-surface);
+            color: var(--md-sys-color-on-surface);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            transform: translateY(110%);
+            transition: transform 0.5s cubic-bezier(0.2, 0, 0, 1);
+            border-radius: 42px;
+            overflow: hidden;
+        }
+
+        .app-window.open {
+            transform: translateY(0);
+        }
+
+        .m3-header {
+            height: 64px;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            background: var(--md-sys-color-surface);
+            color: var(--md-sys-color-on-surface);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .m3-content {
+            flex: 1;
+            overflow-y: auto;
+            background: var(--md-sys-color-surface);
+            color: var(--md-sys-color-on-surface);
+            padding: 0 16px 40px 16px;
+        }
+
+        /* Custom Scrollbar */
+        .m3-content::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .m3-content::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 2px;
+        }
+
+        /* Mobile Override */
+        @media (max-width: 600px) {
+            #phone-bezel {
+                width: 100%;
+                height: 100%;
+                border-radius: 0;
+                border: none;
+                padding: 0;
+            }
+
+            #screen {
+                border-radius: 0;
+            }
+
+            .app-window {
+                border-radius: 0;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .animate-pop {
+            animation: fadeIn 0.3s cubic-bezier(0.2, 0, 0, 1);
+        }
+
+        /* M3 Cards */
+        .m3-card {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .m3-primary-text {
+            color: var(--md-sys-color-on-surface);
+        }
+
+        .m3-secondary-text {
+            color: var(--md-sys-color-on-surface-variant);
+            font-size: 0.9em;
+        }
+
+        /* Themed Icons Colors */
+        .bg-lime-200 {
+            background-color: #d6eda6 !important;
+            color: #1c1d00 !important;
+        }
+
+        .bg-orange-200 {
+            background-color: #ffdbcc !important;
+            color: #2c1600 !important;
+        }
+
+        .bg-sky-200 {
+            background-color: #cce5ff !important;
+            color: #001d32 !important;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="phone-bezel">
+        <div id="screen">
+
+            <!-- Status Bar -->
+            <div id="status-bar">
+                <div id="clock">12:00</div>
+                <div class="flex gap-2 text-xs items-center">
+                    <i class="fas fa-signal"></i>
+                    <i class="fas fa-wifi"></i>
+                    <i class="fas fa-battery-full text-sm"></i>
+                </div>
+            </div>
+
+            <!-- Search Bar (Top) -->
+            <div id="search-bar" onclick="alert('Search feature coming soon!')">
+                <i class="fab fa-google text-xl mr-3"
+                    style="background: conic-gradient(from 0deg, #ea4335 0deg 90deg, #4285f4 90deg 180deg, #34a853 180deg 270deg, #fbbc05 270deg 360deg); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;"></i>
+                <div class="flex-1"></div>
+                <i class="fas fa-magic text-white opacity-70 mr-4"></i>
+                <i class="fas fa-microphone text-white opacity-70 mr-4"></i>
+                <i class="fas fa-camera text-white opacity-70"></i>
+            </div>
+
+            <!-- Big Clock Widget -->
+            <div id="hero-clock" class="flex flex-col items-center justify-center mt-12 mb-auto animate-pop">
+                <div id="widget-date"
+                    class="text-white text-lg font-medium tracking-wide drop-shadow-md opacity-90 mb-[-10px]">Kamis, 15
+                    Jan</div>
+                <div id="widget-time" class="text-white font-thin tracking-tighter drop-shadow-lg"
+                    style="font-size: 86px; line-height: 1;">11.51</div>
+            </div>
+
+            <!-- Home Screen Shortcuts Grid -->
+            <!-- ADDED: Apps Grid relative to "Above About" request -->
+            <div id="apps-grid" style="margin-bottom: 40px; padding-bottom: 0px;">
+                <!-- Western World Game App -->
+                <div class="app-icon" onclick="window.location.href='game.html'">
+                    <div class="icon-bg" style="background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%);">
+                        <i class="fas fa-hat-cowboy text-2xl drop-shadow-sm"></i>
+                    </div>
+                    <span class="app-label mt-2 text-center">Westcoast</span>
+                </div>
+
+                <!-- Spacers for Grid Alignment -->
+                <div></div>
+                <div></div>
+
+                <!-- World of Navy App -->
+                <div class="app-icon" onclick="window.location.href='worldofnavy/index.html'">
+                    <div class="icon-bg" style="background: linear-gradient(135deg, #001f3f 0%, #0074D9 100%);">
+                        <i class="fas fa-anchor text-2xl drop-shadow-sm"></i>
+                    </div>
+                    <span class="app-label mt-2 text-center">WoN</span>
+                </div>
+            </div>
+
+            <div id="shortcuts-grid"
+                style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px 12px; padding: 0 16px; margin-bottom: 24px;">
+
+                <!-- About Shortcut -->
+                <div class="app-icon" onclick="openApp('app-about')">
+                    <div class="icon-bg" style="background: linear-gradient(135deg, #FF512F 0%, #DD2476 100%);">
+                        <i class="fas fa-ghost text-2xl drop-shadow-sm"></i>
+                    </div>
+                    <span class="app-label mt-2">About</span>
+                </div>
+
+                <!-- Experience Shortcut -->
+                <div class="app-icon" onclick="openApp('app-experience')">
+                    <div class="icon-bg" style="background: linear-gradient(135deg, #1D976C 0%, #93F9B9 100%);">
+                        <i class="fas fa-rocket text-2xl drop-shadow-sm"></i>
+                    </div>
+                    <span class="app-label mt-2">Work</span>
+                </div>
+
+                <!-- Projects Shortcut -->
+                <div class="app-icon" onclick="openApp('app-browser')">
+                    <div class="icon-bg" style="background: linear-gradient(135deg, #8E2DE2 0%, #4A00E0 100%);">
+                        <i class="fas fa-gamepad text-2xl drop-shadow-sm"></i>
+                    </div>
+                    <span class="app-label mt-2">Project</span>
+                </div>
+
+                <!-- Contact Shortcut -->
+                <div class="app-icon" onclick="openApp('app-contact')">
+                    <div class="icon-bg" style="background: linear-gradient(135deg, #F7971E 0%, #FFD200 100%);">
+                        <i class="fas fa-paper-plane text-2xl drop-shadow-sm"></i>
+                    </div>
+                    <span class="app-label mt-2">Contact</span>
+                </div>
+
+            </div>
+
+            <!-- Dock (3 Icons) -->
+            <div id="dock" class="flex justify-between items-end px-8 pb-4 mb-4 z-20 w-3/4 mx-auto">
+
+                <!-- Gallery (Left) -->
+                <div class="app-icon" onclick="openApp('app-gallery')">
+                    <div class="icon-bg"
+                        style="background: linear-gradient(135deg, #e52d27 0%, #b31217 100%); width: 64px; height: 64px;">
+                        <i class="fas fa-palette text-2xl drop-shadow-md"></i>
+                    </div>
+                </div>
+
+                <!-- Browser (Right) -->
+                <div class="app-icon" onclick="openApp('app-browser')">
+                    <div class="icon-bg"
+                        style="background: linear-gradient(135deg, #1c92d2 0%, #f2fcfe 100%); width: 64px; height: 64px;">
+                        <i class="fas fa-compass text-3xl drop-shadow-md"></i>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- 3-Button Navigation -->
+            <div id="nav-buttons" class="h-12 w-full flex justify-between items-center px-12 z-50 mb-2">
+                <!-- Menu -->
+                <button class="text-white/70 text-2xl active:text-white" onclick="alert('Menu')"><i
+                        class="fas fa-bars"></i></button>
+                <!-- Home -->
+                <button class="text-white/70 text-2xl active:text-white" onclick="goHome()"><i
+                        class="far fa-circle"></i></button>
+                <!-- Back -->
+                <button class="text-white/70 text-2xl active:text-white" onclick="goBack()"><i
+                        class="fas fa-chevron-left"></i></button>
+            </div>
+
+            <!-- ================= APPS ================= -->
+
+            <!-- PROJECTS APP (Browser) -->
+            <div id="app-browser" class="app-window">
+                <div class="m3-header border-b border-gray-200">
+                    <button class="p-2 mr-2 rounded-full hover:bg-black/5" onclick="closeApp('app-browser')">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <span class="text-xl font-normal">Files</span>
+                </div>
+                <div class="m3-content">
+                    <div class="py-4">
+
+                        <!-- Websites Section -->
+                        <h2 class="text-sm font-bold text-blue-600 mb-3 uppercase tracking-wider pl-1">Web Development
+                        </h2>
+
+                        <a href="https://myuang.vercel.app" target="_blank"
+                            class="block m3-card hover:bg-gray-50 transition-colors">
+                            <div class="flex items-center mb-2">
+                                <div
+                                    class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mr-3">
+                                    <i class="fas fa-wallet text-sm"></i>
+                                </div>
+                                <span class="font-medium m3-primary-text">MyUang</span>
+                            </div>
+                            <div class="m3-secondary-text mb-2">Financial Tracking App</div>
+                        </a>
+
+                        <a href="https://cakralabs.me" target="_blank"
+                            class="block m3-card hover:bg-gray-50 transition-colors">
+                            <div class="flex items-center mb-2">
+                                <div
+                                    class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-700 mr-3">
+                                    <i class="fas fa-robot text-sm"></i>
+                                </div>
+                                <span class="font-medium m3-primary-text">Cakra Labs</span>
+                            </div>
+                            <div class="m3-secondary-text mb-2">Creative AI Automation Agency</div>
+                        </a>
+
+                        <a href="https://evpowering.vercel.app" target="_blank"
+                            class="block m3-card hover:bg-gray-50 transition-colors">
+                            <div class="flex items-center mb-2">
+                                <div
+                                    class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-600 mr-3">
+                                    <i class="fas fa-bolt text-sm"></i>
+                                </div>
+                                <span class="font-medium m3-primary-text">EV Powering</span>
+                            </div>
+                            <div class="m3-secondary-text">EV Solutions Landing Page</div>
+                        </a>
+
+                        <a href="https://rotiklasik.vercel.app" target="_blank"
+                            class="block m3-card hover:bg-gray-50 transition-colors">
+                            <div class="flex items-center mb-2">
+                                <div
+                                    class="w-8 h-8 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-600 mr-3">
+                                    <i class="fas fa-bread-slice text-sm"></i>
+                                </div>
+                                <span class="font-medium m3-primary-text">Roti Klasik</span>
+                            </div>
+                            <div class="m3-secondary-text">Bakery Brand Showcase</div>
+                        </a>
+
+
+
+                        <!-- Graphics Section -->
+                        <h2 class="text-sm font-bold text-purple-600 mb-3 mt-6 uppercase tracking-wider pl-1">Graphic
+                            Design</h2>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div
+                                class="aspect-square bg-gray-200 rounded-lg overflow-hidden relative border border-gray-200">
+                                <img src="images/cakralabs pembukaan slide 4.png" class="w-full h-full object-cover">
+                            </div>
+                            <div
+                                class="aspect-square bg-gray-200 rounded-lg overflow-hidden relative border border-gray-200">
+                                <img src="images/cakra labs pembukaan slide 2.png" class="w-full h-full object-cover">
+                            </div>
+                            <div
+                                class="aspect-square bg-gray-200 rounded-lg overflow-hidden relative border border-gray-200">
+                                <img src="images/cakra labs slide pembukaan 3.png" class="w-full h-full object-cover">
+                            </div>
+                            <div
+                                class="aspect-square bg-gray-200 rounded-lg overflow-hidden relative border border-gray-200">
+                                <img src="images/Biyan Final.png" class="w-full h-full object-cover">
+                            </div>
+                            <div
+                                class="aspect-square bg-gray-200 rounded-lg overflow-hidden relative border border-gray-200">
+                                <img src="images/DTM Merc 190E Klasse 1 - Feed 1 Promotion.png"
+                                    class="w-full h-full object-cover">
+                            </div>
+                            <div
+                                class="aspect-square bg-gray-200 rounded-lg overflow-hidden relative border border-gray-200">
+                                <img src="images/ON TSHIRT BASTOS Back.png" class="w-full h-full object-cover">
+                            </div>
+                            <div
+                                class="aspect-square bg-gray-200 rounded-lg overflow-hidden relative border border-gray-200">
+                                <img src="images/Starlet bagas final with kalemia ng.png"
+                                    class="w-full h-full object-cover">
+                            </div>
+                            <div
+                                class="aspect-square bg-gray-200 rounded-lg overflow-hidden relative border border-gray-200">
+                                <img src="images/project decal mas haikal rocky final.png"
+                                    class="w-full h-full object-cover">
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- GALLERY APP (Graphics) -->
+            <div id="app-gallery" class="app-window">
+                <div class="m3-header border-b border-gray-200">
+                    <button class="p-2 mr-2 rounded-full hover:bg-black/5" onclick="closeApp('app-gallery')">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <span class="text-xl font-normal">Gallery</span>
+                </div>
+                <div class="m3-content">
+                    <div class="py-4">
+                        <h2 class="text-sm font-bold text-purple-600 mb-3 uppercase tracking-wider pl-1">Graphic
+                            Design</h2>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div
+                                class="aspect-square bg-gray-200 rounded-lg overflow-hidden relative border border-gray-200">
+                                <img src="images/cakralabs pembukaan slide 4.png" class="w-full h-full object-cover">
+                            </div>
+                            <div
+                                class="aspect-square bg-gray-200 rounded-lg overflow-hidden relative border border-gray-200">
+                                <img src="images/cakra labs pembukaan slide 2.png" class="w-full h-full object-cover">
+                            </div>
+                            <div
+                                class="aspect-square bg-gray-200 rounded-lg overflow-hidden relative border border-gray-200">
+                                <img src="images/cakra labs slide pembukaan 3.png" class="w-full h-full object-cover">
+                            </div>
+                            <div
+                                class="aspect-square bg-gray-200 rounded-lg overflow-hidden relative border border-gray-200">
+                                <img src="images/Biyan Final.png" class="w-full h-full object-cover">
+                            </div>
+                            <div
+                                class="aspect-square bg-gray-200 rounded-lg overflow-hidden relative border border-gray-200">
+                                <img src="images/DTM Merc 190E Klasse 1 - Feed 1 Promotion.png"
+                                    class="w-full h-full object-cover">
+                            </div>
+                            <div
+                                class="aspect-square bg-gray-200 rounded-lg overflow-hidden relative border border-gray-200">
+                                <img src="images/ON TSHIRT BASTOS Back.png" class="w-full h-full object-cover">
+                            </div>
+                            <div
+                                class="aspect-square bg-gray-200 rounded-lg overflow-hidden relative border border-gray-200">
+                                <img src="images/Starlet bagas final with kalemia ng.png"
+                                    class="w-full h-full object-cover">
+                            </div>
+                            <div
+                                class="aspect-square bg-gray-200 rounded-lg overflow-hidden relative border border-gray-200">
+                                <img src="images/project decal mas haikal rocky final.png"
+                                    class="w-full h-full object-cover">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CONTACT APP -->
+            <div id="app-contact" class="app-window">
+                <div class="m3-header">
+                    <button class="p-2 mr-2 rounded-full hover:bg-black/5" onclick="closeApp('app-contact')">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <span class="text-xl font-normal">Contact</span>
+                </div>
+                <div class="m3-content">
+                    <div class="flex flex-col items-center justify-center pt-10 pb-6">
+                        <div
+                            class="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mb-4 text-blue-600">
+                            <i class="fas fa-address-book text-4xl"></i>
+                        </div>
+                        <h2 class="text-2xl font-normal text-slate-800">Let's Connect</h2>
+                        <p class="text-slate-500 text-sm mt-2">Feel free to reach out!</p>
+                    </div>
+
+                    <div class="space-y-3">
+                        <a href="mailto:adityawealthyopt2281@gmail.com"
+                            class="block m3-card flex items-center hover:bg-gray-50 active:bg-gray-100">
+                            <div
+                                class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-red-500 mr-4">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <div>
+                                <div class="text-slate-900 font-medium">Email</div>
+                                <div class="text-xs text-slate-500">adityawealthyopt2281@gmail.com</div>
+                            </div>
+                        </a>
+
+                        <a href="https://wa.me/6285880574423" target="_blank"
+                            class="block m3-card flex items-center hover:bg-gray-50 active:bg-gray-100">
+                            <div
+                                class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-500 mr-4">
+                                <i class="fab fa-whatsapp text-lg"></i>
+                            </div>
+                            <div>
+                                <div class="text-slate-900 font-medium">WhatsApp</div>
+                                <div class="text-xs text-slate-500">+62 858-8057-4423</div>
+                            </div>
+                        </a>
+
+                        <a href="https://www.instagram.com/bifidum.co?igsh=aGwzZGE1NzhwejY0" target="_blank"
+                            class="block m3-card flex items-center hover:bg-gray-50 active:bg-gray-100">
+                            <div
+                                class="w-10 h-10 rounded-full bg-pink-100 flex items-center justify-center text-pink-500 mr-4">
+                                <i class="fab fa-instagram text-lg"></i>
+                            </div>
+                            <div>
+                                <div class="text-slate-900 font-medium">Instagram</div>
+                                <div class="text-xs text-slate-500">@bifidum.co</div>
+                            </div>
+                        </a>
+
+                        <a href="https://www.linkedin.com/in/adityaptranamta" target="_blank"
+                            class="block m3-card flex items-center hover:bg-gray-50 active:bg-gray-100">
+                            <div
+                                class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-500 mr-4">
+                                <i class="fab fa-linkedin text-lg"></i>
+                            </div>
+                            <div>
+                                <div class="text-slate-900 font-medium">LinkedIn</div>
+                                <div class="text-xs text-slate-500">Aditya Putra Anamta</div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ABOUT APP -->
+            <div id="app-about" class="app-window">
+                <div class="m3-header sticky top-0 bg-[var(--md-sys-color-surface)] z-20">
+                    <button class="p-2 mr-2 rounded-full hover:bg-black/5" onclick="closeApp('app-about')">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <span class="text-xl font-normal">About Me</span>
+                </div>
+                <div class="m3-content pb-20">
+                    <!-- Profile Header -->
+                    <div class="flex items-center px-2 py-4 gap-4">
+                        <div
+                            class="w-20 h-20 rounded-full overflow-hidden border-2 border-red-500 shadow-lg flex-shrink-0">
+                            <img src="images/Screenshot_20231129-194832_Gallery-1.jpg"
+                                class="w-full h-full object-cover">
+                        </div>
+                        <div class="flex flex-col">
+                            <h2 class="text-xl font-bold text-slate-900 leading-tight">Aditya Putra Anamta</h2>
+                            <span class="text-blue-600 text-xs font-semibold mt-1">Digital Business Student | Creative &
+                                Tech Specialist</span>
+                            <div class="text-slate-500 text-xs mt-0.5 flex items-center">
+                                <i class="fas fa-map-marker-alt mr-1.5 text-[10px]"></i> Jakarta, Indonesia
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Intro Text -->
+                    <div class="px-2 mb-4">
+                        <p class="text-xs text-slate-600 leading-relaxed text-justify">
+                            Digital Business student with a technical background in Software Engineering. I combine
+                            design skills with code to build functional brands and web products. Currently running an
+                            automation agency and a clothing brand while managing corporate projects for a
+                            multi-industry group.
+                            Practical experience in UI/UX, front-end development, and project management.
+                        </p>
+                    </div>
+
+                    <!-- Links -->
+                    <div class="px-2 mb-6 flex flex-col gap-2">
+                        <a href="https://drive.google.com/file/d/1AadAHSGFH0ZlFoLWZZUzJs_1KKNGeE3X/view?usp=drive_link"
+                            target="_blank"
+                            class="flex items-center text-blue-600 text-xs font-medium hover:underline w-fit">
+                            <i class="fas fa-file-pdf mr-2"></i> See my resume here
+                        </a>
+                        <a href="https://drive.google.com/file/d/1E_qPBoCMWU5ej9NWMrzUq7Pr8RhLPTng/view?usp=drive_link"
+                            target="_blank"
+                            class="flex items-center text-blue-600 text-xs font-medium hover:underline w-fit">
+                            <i class="fas fa-file-alt mr-2"></i> My Paper Portfolio
+                        </a>
+                    </div>
+
+                    <!-- Banner Image -->
+                    <div class="w-full rounded-xl overflow-hidden mb-6 shadow-lg border border-gray-200">
+                        <img src="images/Portfolio Aditya Putra Anamta header.png" class="w-full h-auto"
+                            alt="Aditya Banner">
+                    </div>
+
+                    <!-- Journey Text -->
+                    <div class="px-2 mb-6">
+                        <p class="text-xs text-slate-600 leading-relaxed text-justify">
+                            My journey into technology began during my Vocational High School years, specializing in
+                            Software Engineering (Java, SQL). This technical foundation sparked a curiosity that evolved
+                            into a passion for bridging the gap between creativity and automation. Today, as a founder
+                            of Cakra Labs, I leverage cutting-edge AI tools to redefine digital workflows.
+                        </p>
+                    </div>
+
+                    <!-- Core Skills -->
+                    <div class="px-2 mb-4">
+                        <h3 class="text-sm font-bold text-blue-600 mb-3">Core Skills</h3>
+                        <div class="flex flex-wrap gap-2">
+                            <!-- White/Light style tags as per reference, adapted for light mode visibility -->
+                            <span
+                                class="bg-blue-50 border border-blue-200 text-blue-700 px-3 py-1 rounded text-[10px] font-medium">Three.js</span>
+                            <span
+                                class="bg-blue-50 border border-blue-200 text-blue-700 px-3 py-1 rounded text-[10px] font-medium">React.js</span>
+                            <span
+                                class="bg-blue-50 border border-blue-200 text-blue-700 px-3 py-1 rounded text-[10px] font-medium">Next.js</span>
+                            <span
+                                class="bg-blue-50 border border-blue-200 text-blue-700 px-3 py-1 rounded text-[10px] font-medium">HTML5/CSS3</span>
+                            <span
+                                class="bg-blue-50 border border-blue-200 text-blue-700 px-3 py-1 rounded text-[10px] font-medium">Tailwind
+                                CSS</span>
+                            <span
+                                class="bg-purple-50 border border-purple-200 text-purple-700 px-3 py-1 rounded text-[10px] font-medium">Midjourney</span>
+                            <span
+                                class="bg-orange-50 border border-orange-200 text-orange-700 px-3 py-1 rounded text-[10px] font-medium">Figma</span>
+                            <span
+                                class="bg-yellow-50 border border-yellow-200 text-yellow-700 px-3 py-1 rounded text-[10px] font-medium">Adobe
+                                Illustrator</span>
+                        </div>
+                    </div>
+
+                    <div class="h-8"></div>
+                </div>
+            </div>
+
+            <!-- EXPERIENCE APP -->
+            <div id="app-experience" class="app-window">
+                <div class="m3-header">
+                    <button class="p-2 mr-2 rounded-full hover:bg-black/5" onclick="closeApp('app-experience')">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <span class="text-xl font-normal">Experience</span>
+                </div>
+                <div class="m3-content">
+                    <div class="space-y-4 pt-4">
+
+                        <!-- Item 1 -->
+                        <div class="m3-card border-none bg-white shadow-none">
+                            <div class="flex gap-4">
+                                <div class="flex flex-col items-center">
+                                    <div
+                                        class="w-3 h-3 rounded-full bg-blue-500 mt-1.5 shadow-[0_0_10px_rgba(59,130,246,0.3)]">
+                                    </div>
+                                    <div class="w-0.5 h-full bg-gray-200 my-1"></div>
+                                </div>
+                                <div class="pb-2">
+                                    <span class="text-xs text-blue-600 font-mono">2024 - Present</span>
+                                    <h3 class="text-lg font-medium text-slate-900">Founder & Lead Creative</h3>
+                                    <div class="text-sm text-slate-500 mb-2">Cakra Labs</div>
+                                    <p class="text-sm text-slate-600 leading-relaxed">
+                                        Founded AI automation agency. Built agency website & client prototypes. Managed
+                                        digital strategy for B2B.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Item 2 -->
+                        <div class="m3-card border-none bg-white shadow-none">
+                            <div class="flex gap-4">
+                                <div class="flex flex-col items-center">
+                                    <div class="w-3 h-3 rounded-full bg-gray-400 mt-1.5"></div>
+                                    <div class="w-0.5 h-full bg-gray-200 my-1"></div>
+                                </div>
+                                <div class="pb-2">
+                                    <span class="text-xs text-slate-400 font-mono">2024 - 2025</span>
+                                    <h3 class="text-lg font-medium text-slate-900">Project Manager</h3>
+                                    <div class="text-sm text-slate-500 mb-2">PT. SBM Group</div>
+                                    <p class="text-sm text-slate-600 leading-relaxed">
+                                        Managed marketing across Laundry, Property & Banking units. Designed corporate
+                                        website.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Item 3 -->
+                        <div class="m3-card border-none bg-white shadow-none">
+                            <div class="flex gap-4">
+                                <div class="flex flex-col items-center">
+                                    <div class="w-3 h-3 rounded-full bg-gray-400 mt-1.5"></div>
+                                    <div class="w-0.5 h-full bg-gray-200 my-1"></div>
+                                </div>
+                                <div class="pb-2">
+                                    <span class="text-xs text-slate-400 font-mono">2021 - Present</span>
+                                    <h3 class="text-lg font-medium text-slate-900">Founder</h3>
+                                    <div class="text-sm text-slate-500 mb-2">Bifidum.co</div>
+                                    <p class="text-sm text-slate-600 leading-relaxed">
+                                        Automotive fashion brand. Produced high-precision vector art & decals.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Item 4 -->
+                        <div class="m3-card border-none bg-white shadow-none">
+                            <div class="flex gap-4">
+                                <div class="flex flex-col items-center">
+                                    <div class="w-3 h-3 rounded-full bg-gray-400 mt-1.5"></div>
+                                </div>
+                                <div class="pb-2">
+                                    <span class="text-xs text-slate-400 font-mono">2024 - 2025</span>
+                                    <h3 class="text-lg font-medium text-slate-900">Communication Dept</h3>
+                                    <div class="text-sm text-slate-500 mb-2">BEM Cyber University</div>
+                                    <p class="text-sm text-slate-600 leading-relaxed">
+                                        Designer for Student Executive Board.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- CONTACT APP -->
+            <div id="app-contact" class="app-window">
+                <div class="m3-header">
+                    <button class="p-2 mr-2 rounded-full hover:bg-white/10" onclick="closeApp('app-contact')">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <span class="text-xl font-normal">Contacts</span>
+                </div>
+                <div class="m3-content">
+                    <div class="py-4 space-y-2">
+
+                        <a href="https://wa.me/6285880574423" target="_blank"
+                            class="flex items-center p-4 rounded-full hover:bg-slate-800 transition">
+                            <div
+                                class="w-10 h-10 rounded-full bg-green-700 flex items-center justify-center text-white mr-4">
+                                <i class="fab fa-whatsapp text-lg"></i>
+                            </div>
+                            <div>
+                                <div class="text-base text-white">WhatsApp</div>
+                                <div class="text-sm text-gray-400">+62 858 8057 4423</div>
+                            </div>
+                        </a>
+
+                        <a href="mailto:adityawealthyopt2281@gmail.com"
+                            class="flex items-center p-4 rounded-full hover:bg-slate-800 transition">
+                            <div
+                                class="w-10 h-10 rounded-full bg-blue-700 flex items-center justify-center text-white mr-4">
+                                <i class="fas fa-envelope text-lg"></i>
+                            </div>
+                            <div>
+                                <div class="text-base text-white">Email</div>
+                                <div class="text-sm text-gray-400">adityawealthyopt2281@gmail.com</div>
+                            </div>
+                        </a>
+
+                        <a href="https://www.instagram.com/bifidum.co?igsh=aGwzZGE1NzhwejY0" target="_blank"
+                            class="flex items-center p-4 rounded-full hover:bg-slate-800 transition">
+                            <div
+                                class="w-10 h-10 rounded-full bg-pink-700 flex items-center justify-center text-white mr-4">
+                                <i class="fab fa-instagram text-lg"></i>
+                            </div>
+                            <div>
+                                <div class="text-base text-white">Instagram</div>
+                                <div class="text-sm text-gray-400">@bifidum.co</div>
+                            </div>
+                        </a>
+
+                        <a href="https://www.linkedin.com/in/adityaptranamta" target="_blank"
+                            class="flex items-center p-4 rounded-full hover:bg-slate-800 transition">
+                            <div
+                                class="w-10 h-10 rounded-full bg-blue-800 flex items-center justify-center text-white mr-4">
+                                <i class="fab fa-linkedin text-lg"></i>
+                            </div>
+                            <div>
+                                <div class="text-base text-white">LinkedIn</div>
+                                <div class="text-sm text-gray-400">Aditya Putra Anamta</div>
+                            </div>
+                        </a>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // === CLOCK & DATE ===
+        function updateTime() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+
+            // Format: Tue, Jan 15
+            const options = { weekday: 'short', month: 'short', day: 'numeric' };
+            const dateStr = now.toLocaleDateString('en-US', options);
+
+            document.getElementById('clock').innerText = timeStr;
+            const widgetTime = document.getElementById('widget-time');
+            if (widgetTime) widgetTime.innerText = timeStr;
+            document.getElementById('widget-date').innerText = dateStr;
+        }
+        setInterval(updateTime, 1000);
+        updateTime();
+
+        // === APP NAVIGATION ===
+        const openAppsStack = [];
+
+        function openApp(appId) {
+            const app = document.getElementById(appId);
+            app.classList.add('open');
+            openAppsStack.push(appId);
+            // Change status bar style if needed (omitted for simplicity)
+        }
+
+        function closeApp(appId) {
+            const app = document.getElementById(appId);
+            app.classList.remove('open');
+            const index = openAppsStack.indexOf(appId);
+            if (index > -1) openAppsStack.splice(index, 1);
+        }
+
+        // Gesture Nav: Swipe from side to back (Simple visual implementation for clicking pill)
+        // For web, clicking the home pill clears all
+        document.getElementById('gesture-nav').addEventListener('click', () => {
+            // Go Home
+            document.querySelectorAll('.app-window').forEach(app => {
+                app.classList.remove('open');
+            });
+            openAppsStack.length = 0;
+        });
+
+    </script>
+</body>
+
+
+</html>

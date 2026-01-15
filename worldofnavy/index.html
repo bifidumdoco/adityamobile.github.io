@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>World of Navy - 3v3 Battle</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+    </script>
+    <!-- Nipple.js for Mobile Controls -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/nipplejs/0.10.1/nipplejs.min.js"></script>
+    <style>
+        /* Mobile Controls UI */
+        #mobile-ui {
+            display: none;
+            /* Shown by JS */
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        #joystick-zone {
+            position: absolute;
+            bottom: 40px;
+            left: 40px;
+            width: 150px;
+            height: 150px;
+            pointer-events: auto;
+        }
+
+        #look-zone {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 50%;
+            height: 100%;
+            pointer-events: auto;
+        }
+
+        #fire-btn-container {
+            position: absolute;
+            bottom: 80px;
+            right: 50px;
+            pointer-events: auto;
+        }
+
+        .fire-btn {
+            width: 90px;
+            height: 90px;
+            background: rgba(255, 0, 0, 0.3);
+            border: 4px solid rgba(255, 100, 100, 0.8);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: bold;
+            font-size: 20px;
+            backdrop-filter: blur(4px);
+            user-select: none;
+        }
+
+        .fire-btn:active {
+            background: rgba(255, 0, 0, 0.6);
+            transform: scale(0.95);
+        }
+    </style>
+</head>
+
+<body>
+    <div id="ui-layer">
+        <!-- 1. LOADING -->
+        <div id="loading-screen">
+            <h1>World of Navy</h1>
+            <p>Loading Assets...</p>
+            <div id="loading-bar-container">
+                <div id="loading-bar"></div>
+            </div>
+        </div>
+
+        <!-- 2. MAIN MENU -->
+        <div id="main-menu" style="display:none;">
+            <h1 class="game-title">World of Navy</h1>
+            <div class="menu-buttons">
+                <button id="btn-menu-start">Start Game</button>
+                <button id="btn-menu-help">Instructions</button>
+                <button id="btn-menu-exit">Exit to Desktop</button>
+            </div>
+        </div>
+
+        <!-- 3. INSTRUCTIONS -->
+        <div id="instructions-screen" style="display:none;">
+            <h2>Captain's Manual</h2>
+            <div class="instruct-content">
+                <p><strong>W / S</strong> : Engine Throttle (Forward/Reverse)</p>
+                <p><strong>A / D</strong> : Rudder (Turn Left/Right)</p>
+                <p><strong>Mouse</strong> : Look Around & Aim</p>
+                <p><strong>Left Click / Space</strong> : Fire Main Battery</p>
+                <p><strong>Goal</strong> : Sink all enemy ships!</p>
+                <p><em>Tip: Islands block projectiles. Use them as cover!</em></p>
+            </div>
+            <button id="btn-instruct-back">Back to Menu</button>
+        </div>
+
+        <!-- 4. SHIP SELECTION -->
+        <div id="ship-selection-screen" style="display:none;">
+            <h2>Choose Your Warship</h2>
+            <div id="ship-grid">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+
+        <!-- 5. HUD (IN GAME) -->
+        <!-- 5. HUD (IN GAME) -->
+        <div id="hud" style="display:none;">
+            <div id="top-bar">
+                <div id="team-blue-icons" class="team-icons left">
+                    <!-- Icons injected by JS -->
+                </div>
+                <div id="match-timer">VS</div>
+                <div id="team-red-icons" class="team-icons right">
+                    <!-- Icons injected by JS -->
+                </div>
+            </div>
+            <div id="player-status">
+                <div class="status-row">HP: <div class="hp-bar-container">
+                        <div id="player-hp-bar"></div>
+                    </div>
+                </div>
+                <div class="status-row">Speed: <span id="speed-display">0</span> kts</div>
+            </div>
+            <div id="crosshair">+</div>
+        </div>
+
+        <!-- 6. GAME OVER -->
+        <div id="game-over" style="display:none;">
+            <h1 id="result-title">Victory!</h1>
+            <button onclick="location.reload()">Return to Base</button>
+        </div>
+    </div>
+
+    <!-- 7. MOBILE UI -->
+    <div id="mobile-ui">
+        <div id="joystick-zone"></div>
+        <div id="look-zone"></div>
+        <div id="fire-btn-container">
+            <div id="btn-fire" class="fire-btn">FIRE</div>
+        </div>
+    </div>
+    </div>
+
+    <script type="module" src="js/main.js"></script>
+</body>
+
+</html>

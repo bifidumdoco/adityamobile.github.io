@@ -1,0 +1,232 @@
+body {
+    margin: 0;
+    overflow: hidden;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #001f3f;
+    color: white;
+}
+
+#ui-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+/* Screens */
+#loading-screen,
+#main-menu,
+#instructions-screen,
+#ship-selection-screen,
+#game-over {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+    pointer-events: auto;
+}
+
+/* Common Elements */
+h1,
+h2 {
+    text-shadow: 2px 2px 4px #000;
+}
+
+button {
+    padding: 15px 30px;
+    font-size: 20px;
+    background: #0074D9;
+    color: white;
+    border: 2px solid #0056b3;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin: 10px;
+    pointer-events: auto;
+}
+
+button:hover {
+    background: #0056b3;
+    transform: scale(1.05);
+}
+
+/* Loading */
+#loading-bar-container {
+    width: 300px;
+    height: 20px;
+    background: #333;
+    margin: 20px 0;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+#loading-bar {
+    width: 0%;
+    height: 100%;
+    background: #0074D9;
+    transition: width 0.2s;
+}
+
+/* Ship Selection Grid */
+#ship-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    max-width: 800px;
+    width: 90%;
+}
+
+.ship-card {
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid #555;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: capitalize;
+}
+
+.ship-card:hover {
+    background: rgba(0, 116, 217, 0.3);
+    border-color: #0074D9;
+}
+
+.ship-name {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+/* Instructions */
+.instruct-content {
+    background: rgba(0, 0, 0, 0.5);
+    padding: 30px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    text-align: left;
+    max-width: 600px;
+}
+
+/* HUD */
+#hud {
+    pointer-events: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 5;
+}
+
+/* Top Bar Scoreboard Icons */
+#top-bar {
+    position: absolute;
+    top: 20px;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+}
+
+.team-icons {
+    display: flex;
+    gap: 5px;
+}
+
+.team-icons.left {
+    flex-direction: row-reverse;
+    /* Grow from center out */
+}
+
+#match-timer {
+    font-size: 24px;
+    font-weight: bold;
+    text-shadow: 2px 2px 4px black;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 5px 15px;
+    border-radius: 15px;
+}
+
+.ship-icon {
+    width: 30px;
+    height: 15px;
+    background-color: #fff;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M2,14 L22,14 L20,20 L4,20 Z M6,14 L6,10 L10,10 L10,6 L14,6 L14,10 L18,10 L18,14'/%3E%3E%3C/svg%3E") no-repeat center / contain;
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M2,14 L22,14 L20,20 L4,20 Z M6,14 L6,10 L10,10 L10,6 L14,6 L14,10 L18,10 L18,14'/%3E%3C/svg%3E") no-repeat center / contain;
+    opacity: 0.9;
+    transition: opacity 0.5s;
+}
+
+.team-blue .ship-icon,
+.icon-ally {
+    background-color: #4dabf7;
+}
+
+.team-red .ship-icon,
+.icon-enemy {
+    background-color: #ff6b6b;
+}
+
+.ship-icon.dead {
+    opacity: 0.3;
+    background-color: #555;
+}
+
+
+#player-status {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    background: rgba(0, 0, 0, 0.6);
+    padding: 15px;
+    border-radius: 10px;
+    width: 300px;
+}
+
+.status-row {
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    font-size: 18px;
+}
+
+.hp-bar-container {
+    flex-grow: 1;
+    height: 15px;
+    background: #333;
+    margin-left: 10px;
+    border: 1px solid #555;
+}
+
+#player-hp-bar {
+    width: 100%;
+    height: 100%;
+    background: #2ECC40;
+    transition: width 0.2s;
+}
+
+#crosshair {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 40px;
+    pointer-events: none;
+}
+
+/* Game Over */
+#game-over h1 {
+    color: #ffdc00;
+    font-size: 48px;
+}
