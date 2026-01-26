@@ -200,24 +200,24 @@ button:hover {
 
 #player-status {
     position: absolute;
-    top: 80px;
+    top: 20px;
     left: 20px;
-    background: rgba(0, 0, 0, 0.6);
-    padding: 10px;
-    border-radius: 10px;
-    width: 220px;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 5px;
+    border-radius: 5px;
+    width: 150px;
 }
 
 .status-row {
-    margin-bottom: 5px;
+    margin-bottom: 2px;
     display: flex;
     align-items: center;
-    font-size: 14px;
+    font-size: 11px;
 }
 
 .hp-bar-container {
     flex-grow: 1;
-    height: 10px;
+    height: 6px;
     background: #333;
     margin-left: 10px;
     border: 1px solid #555;
