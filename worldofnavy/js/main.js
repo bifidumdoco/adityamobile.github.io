@@ -638,16 +638,23 @@ class Game {
         });
 
         manager.on('move', (evt, data) => {
-            const fwd = data.vector.y;
+            // Nipple.js Y-axis is inverted (screen coords), so we negate it
+            const fwd = -data.vector.y; // INVERTED: push up = positive
             const turn = data.vector.x;
 
-            // Throttle
-            if (fwd > 0.5) this.input.keys.forward = true; else this.input.keys.forward = false;
-            if (fwd < -0.5) this.input.keys.backward = true; else this.input.keys.backward = false;
+            // Reset all
+            this.input.keys.forward = false;
+            this.input.keys.backward = false;
+            this.input.keys.left = false;
+            this.input.keys.right = false;
 
-            // Rudder
-            if (turn > 0.5) this.input.keys.right = true; else this.input.keys.right = false;
-            if (turn < -0.5) this.input.keys.left = true; else this.input.keys.left = false;
+            // Throttle (forward/backward)
+            if (fwd > 0.4) this.input.keys.forward = true;
+            else if (fwd < -0.4) this.input.keys.backward = true;
+
+            // Rudder (left/right)
+            if (turn > 0.4) this.input.keys.right = true;
+            else if (turn < -0.4) this.input.keys.left = true;
         });
 
         manager.on('end', () => {

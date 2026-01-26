@@ -784,18 +784,27 @@
 
                 joystickManager.on('move', function (evt, data) {
                     if (!data.vector) return;
-                    // Standard Nipple.js: vector x/y are normalized.
-                    // y > 0 is UP (forward), y < 0 is DOWN (backward)
-                    // x > 0 is RIGHT, x < 0 is LEFT
-
-                    const forward = data.vector.y;
+                    // Nipple.js vector: y is INVERTED from expectation (screen coords)
+                    // We invert Y so that pushing UP = positive forward
+                    const forward = -data.vector.y; // INVERTED
                     const turn = data.vector.x;
 
-                    // Thresholds
-                    if (forward > 0.3) moveForward = true; else moveForward = false;
-                    if (forward < -0.3) moveBackward = true; else moveBackward = false;
-                    if (turn > 0.3) moveRight = true; else moveRight = false;
-                    if (turn < -0.3) moveLeft = true; else moveLeft = false;
+                    // Reset all
+                    moveForward = false;
+                    moveBackward = false;
+                    moveLeft = false;
+                    moveRight = false;
+
+                    // Cardinal direction only (pick dominant axis)
+                    if (Math.abs(forward) > Math.abs(turn)) {
+                        // Vertical movement dominant
+                        if (forward > 0.3) moveForward = true;
+                        else if (forward < -0.3) moveBackward = true;
+                    } else {
+                        // Horizontal movement dominant
+                        if (turn > 0.3) moveRight = true;
+                        else if (turn < -0.3) moveLeft = true;
+                    }
                 });
 
                 joystickManager.on('end', function () {
@@ -821,12 +830,12 @@
                     const deltaY = touchY - lastTouchY;
 
                     // Adjust sensitivity as needed
-                    const sensitivity = 0.002;
-                    camera.rotation.y -= deltaX * sensitivity; // Left/Right
-                    camera.rotation.x += deltaY * sensitivity; // FIX: Invert Look (Drag Up -> Look Up)
+                    const sensitivity = 0.003;
+                    camera.rotation.y -= deltaX * sensitivity; // Left/Right (drag left = look left)
+                    camera.rotation.x -= deltaY * sensitivity; // FIXED: drag up = look up (inverted)
 
-                    // Clamp look up/down
-                    camera.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, camera.rotation.x));
+                    // Clamp look up/down to reasonable range
+                    camera.rotation.x = Math.max(-Math.PI / 3, Math.min(Math.PI / 3, camera.rotation.x));
 
                     lastTouchX = touchX;
                     lastTouchY = touchY;
