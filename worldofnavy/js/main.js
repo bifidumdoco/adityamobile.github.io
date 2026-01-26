@@ -14,9 +14,6 @@ class Game {
         this.ships = [];
         this.input = new InputController();
         this.cameraController = null;
-        this.input = new InputController();
-        this.cameraController = null;
-        this.cameraController = null;
         this.isMobile = false;
         this.ocean = null;
         this.assets = {}; // Store loaded GLB models
@@ -80,14 +77,14 @@ class Game {
         // Game Events
         window.addEventListener('ship-shoot', (e) => this.onShipShoot(e.detail));
 
+        // Raycaster for aiming
+        this.raycaster = new THREE.Raycaster();
+        this.aimPoint = new THREE.Vector3();
+
         // Mobile Detection
         if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
             this.setupMobileControls();
         }
-
-        // Raycaster for aiming
-        this.raycaster = new THREE.Raycaster();
-        this.aimPoint = new THREE.Vector3();
 
         // Start Loop
         this.animate();
@@ -179,7 +176,7 @@ class Game {
 
         // Exit Button
         document.getElementById('btn-menu-exit').addEventListener('click', () => {
-            window.location.href = '../index.html'; // Return to mobile home
+            window.location.href = '../desktop.html'; // Return to desktop
         });
     }
 
@@ -233,19 +230,21 @@ class Game {
         if (this.menuMusic && this.menuMusic.isPlaying) this.menuMusic.stop();
         if (this.engineSound) this.engineSound.play();
 
-        if (this.engineSound) this.engineSound.play();
-
         // Show Mobile UI if applicable
         if (this.isMobile) {
             document.getElementById('mobile-ui').style.display = 'block';
         }
 
         // Request Lock
-        document.body.requestPointerLock();
+        // Only lock pointer if NOT mobile (or if user wants to use mouse on mobile?)
+        // Generally mobile doesn't use pointer lock for joystick controls
+        if (!this.isMobile) {
+            document.body.requestPointerLock();
+        }
 
         // Ensure manual click also locks if user unlocks via ESC
         document.addEventListener('click', () => {
-            if (this.isPlaying) {
+            if (this.isPlaying && !this.isMobile) {
                 document.body.requestPointerLock();
             }
         });
@@ -616,19 +615,12 @@ class Game {
         }
     }
 
-    onWindowResize() {
-        if (this.camera && this.renderer) {
-            this.camera.aspect = window.innerWidth / window.innerHeight;
-            this.camera.updateProjectionMatrix();
-            this.renderer.setSize(window.innerWidth, window.innerHeight);
-        }
-    }
-
     setupMobileControls() {
         // Just init logic, show it in startGame
         this.isMobile = true;
 
         // 1. Joystick (Static mode so it's always visible)
+        // Ensure nipplejs is available (loaded via script tag in index.html)
         const manager = nipplejs.create({
             zone: document.getElementById('joystick-zone'),
             mode: 'static',
@@ -638,6 +630,8 @@ class Game {
         });
 
         manager.on('move', (evt, data) => {
+            if (!data.vector) return;
+
             // Get normalized values (-1 to 1)
             const x = data.vector.x;
             const y = data.vector.y;
@@ -721,14 +715,24 @@ class Game {
 
         // 3. Fire Button
         const fireBtn = document.getElementById('btn-fire');
-        fireBtn.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            this.input.keys.fire = true;
-        });
-        fireBtn.addEventListener('touchend', (e) => {
-            e.preventDefault();
-            this.input.keys.fire = false;
-        });
+        if (fireBtn) {
+            fireBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                this.input.keys.fire = true;
+            });
+            fireBtn.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                this.input.keys.fire = false;
+            });
+        }
+    }
+
+    onWindowResize() {
+        if (this.camera && this.renderer) {
+            this.camera.aspect = window.innerWidth / window.innerHeight;
+            this.camera.updateProjectionMatrix();
+            this.renderer.setSize(window.innerWidth, window.innerHeight);
+        }
     }
 }
 

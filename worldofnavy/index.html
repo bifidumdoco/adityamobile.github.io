@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>World of Navy - 3v3 Battle</title>
     <link rel="stylesheet" href="css/style.css">
     <script type="importmap">
@@ -14,14 +14,12 @@
             }
         }
     </script>
-    </script>
     <!-- Nipple.js for Mobile Controls -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/nipplejs/0.10.1/nipplejs.min.js"></script>
     <style>
         /* Mobile Controls UI */
         #mobile-ui {
             display: none;
-            /* Shown by JS */
             position: absolute;
             top: 0;
             left: 0;
@@ -33,15 +31,14 @@
 
         #joystick-zone {
             position: absolute;
-            bottom: 5vmin;
-            left: 5vmin;
-            width: 25vmin;
-            height: 25vmin;
+            bottom: 8vmin;
+            left: 8vmin;
+            width: 28vmin;
+            height: 28vmin;
             pointer-events: auto;
-            /* Visual indicator for joystick area */
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.15);
             border-radius: 50%;
-            border: 2px solid rgba(255, 255, 255, 0.3);
+            border: 3px solid rgba(255, 255, 255, 0.4);
         }
 
         #look-zone {
@@ -61,27 +58,27 @@
         }
 
         .fire-btn {
-            width: 18vmin;
-            height: 18vmin;
-            background: rgba(255, 0, 0, 0.3);
-            border: 4px solid rgba(255, 100, 100, 0.8);
+            width: 20vmin;
+            height: 20vmin;
+            background: rgba(255, 0, 0, 0.35);
+            border: 4px solid rgba(255, 100, 100, 0.9);
             border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
             color: white;
             font-weight: bold;
-            font-size: 4vmin;
+            font-size: 5vmin;
             backdrop-filter: blur(4px);
             user-select: none;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
         }
 
         .fire-btn:active {
-            background: rgba(255, 0, 0, 0.6);
-            transform: scale(0.95);
+            background: rgba(255, 0, 0, 0.7);
+            transform: scale(0.92);
         }
-    </style>
-    <style>
+
         /* Landscape Warning Overlay */
         #rotate-warning {
             display: none;
@@ -91,7 +88,6 @@
             width: 100%;
             height: 100%;
             background: #111;
-            /* Darker for Navy */
             z-index: 9999;
             flex-direction: column;
             justify-content: center;
@@ -109,11 +105,13 @@
 </head>
 
 <body>
+    <!-- Landscape Warning -->
     <div id="rotate-warning">
         <div style="font-size: 15vmin; margin-bottom: 20px;">📱➡️</div>
         <h2 style="font-size: 5vmin;">Captain! Rotate Your Device</h2>
-        <p style="font-size: 3vmin;">Ideally functionality is optimized for Landscape</p>
+        <p style="font-size: 3vmin;">This game is optimized for Landscape mode</p>
     </div>
+
     <div id="ui-layer">
         <!-- 1. LOADING -->
         <div id="loading-screen">
@@ -130,7 +128,7 @@
             <div class="menu-buttons">
                 <button id="btn-menu-start">Start Game</button>
                 <button id="btn-menu-help">Instructions</button>
-                <button id="btn-menu-exit">Exit to Desktop</button>
+                <button id="btn-menu-exit">Exit to Home</button>
             </div>
         </div>
 
@@ -138,10 +136,9 @@
         <div id="instructions-screen" style="display:none;">
             <h2>Captain's Manual</h2>
             <div class="instruct-content">
-                <p><strong>W / S</strong> : Engine Throttle (Forward/Reverse)</p>
-                <p><strong>A / D</strong> : Rudder (Turn Left/Right)</p>
-                <p><strong>Mouse</strong> : Look Around & Aim</p>
-                <p><strong>Left Click / Space</strong> : Fire Main Battery</p>
+                <p><strong>Joystick</strong> : Engine Throttle & Rudder</p>
+                <p><strong>Drag Screen</strong> : Look Around & Aim</p>
+                <p><strong>FIRE Button</strong> : Fire Main Battery</p>
                 <p><strong>Goal</strong> : Sink all enemy ships!</p>
                 <p><em>Tip: Islands block projectiles. Use them as cover!</em></p>
             </div>
@@ -156,7 +153,6 @@
             </div>
         </div>
 
-        <!-- 5. HUD (IN GAME) -->
         <!-- 5. HUD (IN GAME) -->
         <div id="hud" style="display:none;">
             <div id="top-bar">
