@@ -628,11 +628,11 @@ class Game {
         // Just init logic, show it in startGame
         this.isMobile = true;
 
-        // 1. Joystick (Dynamic mode for better touch handling)
+        // 1. Joystick (Static mode so it's always visible)
         const manager = nipplejs.create({
             zone: document.getElementById('joystick-zone'),
-            mode: 'dynamic',
-            catchDistance: 100,
+            mode: 'static',
+            position: { left: '50%', top: '50%' },
             color: 'white',
             size: 100
         });
