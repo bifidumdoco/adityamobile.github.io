@@ -628,19 +628,19 @@ class Game {
         // Just init logic, show it in startGame
         this.isMobile = true;
 
-        // 1. Joystick (Throttle/Rudder)
-        // W/S = Throttle, A/D = Rudder
+        // 1. Joystick (Dynamic mode for better touch handling)
         const manager = nipplejs.create({
             zone: document.getElementById('joystick-zone'),
-            mode: 'static',
-            position: { left: '50%', top: '50%' },
-            color: 'white'
+            mode: 'dynamic',
+            catchDistance: 100,
+            color: 'white',
+            size: 100
         });
 
         manager.on('move', (evt, data) => {
-            // Nipple.js Y-axis is inverted (screen coords), so we negate it
-            const fwd = -data.vector.y; // INVERTED: push up = positive
-            const turn = data.vector.x;
+            // Get normalized values (-1 to 1)
+            const x = data.vector.x;
+            const y = data.vector.y;
 
             // Reset all
             this.input.keys.forward = false;
@@ -648,13 +648,15 @@ class Game {
             this.input.keys.left = false;
             this.input.keys.right = false;
 
-            // Throttle (forward/backward)
-            if (fwd > 0.4) this.input.keys.forward = true;
-            else if (fwd < -0.4) this.input.keys.backward = true;
+            // Threshold for activation
+            const threshold = 0.3;
 
-            // Rudder (left/right)
-            if (turn > 0.4) this.input.keys.right = true;
-            else if (turn < -0.4) this.input.keys.left = true;
+            // Enable ALL directions
+            // nipplejs: y positive = down on screen, y negative = up on screen
+            if (y > threshold) this.input.keys.backward = true;
+            if (y < -threshold) this.input.keys.forward = true;
+            if (x > threshold) this.input.keys.right = true;
+            if (x < -threshold) this.input.keys.left = true;
         });
 
         manager.on('end', () => {
@@ -664,29 +666,58 @@ class Game {
             this.input.keys.right = false;
         });
 
-        // 2. Look (Touch Drag)
+        // 2. Look (Touch Drag) - with touch identifier for multi-touch
         const lookZone = document.getElementById('look-zone');
+        let lookTouchId = null;
         let lastX = 0;
         let lastY = 0;
 
         lookZone.addEventListener('touchstart', (e) => {
-            lastX = e.touches[0].clientX;
-            lastY = e.touches[0].clientY;
-        }, { passive: false });
+            if (lookTouchId === null) {
+                const touch = e.changedTouches[0];
+                lookTouchId = touch.identifier;
+                lastX = touch.clientX;
+                lastY = touch.clientY;
+            }
+        }, { passive: true });
 
         lookZone.addEventListener('touchmove', (e) => {
             e.preventDefault();
-            const x = e.touches[0].clientX;
-            const y = e.touches[0].clientY;
 
-            // Send delta to InputController (simulating mouse movement)
-            // We scale it up slightly as touch can be finer than mouse
-            this.input.mouseDeltaX = (x - lastX) * 2;
-            this.input.mouseDeltaY = (y - lastY) * 2;
+            for (let i = 0; i < e.changedTouches.length; i++) {
+                const touch = e.changedTouches[i];
+                if (touch.identifier === lookTouchId) {
+                    const x = touch.clientX;
+                    const y = touch.clientY;
 
-            lastX = x;
-            lastY = y;
+                    // Send delta to InputController
+                    this.input.mouseDeltaX = (x - lastX) * 2;
+                    this.input.mouseDeltaY = (y - lastY) * 2;
+
+                    lastX = x;
+                    lastY = y;
+                    break;
+                }
+            }
         }, { passive: false });
+
+        lookZone.addEventListener('touchend', (e) => {
+            for (let i = 0; i < e.changedTouches.length; i++) {
+                if (e.changedTouches[i].identifier === lookTouchId) {
+                    lookTouchId = null;
+                    break;
+                }
+            }
+        }, { passive: true });
+
+        lookZone.addEventListener('touchcancel', (e) => {
+            for (let i = 0; i < e.changedTouches.length; i++) {
+                if (e.changedTouches[i].identifier === lookTouchId) {
+                    lookTouchId = null;
+                    break;
+                }
+            }
+        }, { passive: true });
 
         // 3. Fire Button
         const fireBtn = document.getElementById('btn-fire');

@@ -774,72 +774,109 @@
                 // UI shows only after start
                 document.getElementById('interaction-prompt').style.bottom = '40%'; // Move prompt up
 
-                // 1. Joystick
+                // 1. Joystick (Dynamic mode for better touch handling)
                 const joystickManager = nipplejs.create({
                     zone: document.getElementById('joystick-zone'),
-                    mode: 'static',
-                    position: { left: '50%', top: '50%' },
-                    color: 'white'
+                    mode: 'dynamic',
+                    catchDistance: 100,
+                    color: 'white',
+                    size: 120
                 });
 
                 joystickManager.on('move', function (evt, data) {
                     if (!data.vector) return;
-                    // Nipple.js vector: y is INVERTED from expectation (screen coords)
-                    // We invert Y so that pushing UP = positive forward
-                    const forward = -data.vector.y; // INVERTED
-                    const turn = data.vector.x;
 
-                    // Reset all
+                    // Get normalized values (-1 to 1)
+                    const x = data.vector.x;
+                    const y = data.vector.y;
+
+                    // Reset all movement
                     moveForward = false;
                     moveBackward = false;
                     moveLeft = false;
                     moveRight = false;
 
-                    // Cardinal direction only (pick dominant axis)
-                    if (Math.abs(forward) > Math.abs(turn)) {
-                        // Vertical movement dominant
-                        if (forward > 0.3) moveForward = true;
-                        else if (forward < -0.3) moveBackward = true;
-                    } else {
-                        // Horizontal movement dominant
-                        if (turn > 0.3) moveRight = true;
-                        else if (turn < -0.3) moveLeft = true;
-                    }
+                    // Threshold for activation
+                    const threshold = 0.3;
+
+                    // Enable ALL 4 directions (can combine for diagonal)
+                    // Y-axis: nipplejs uses screen coords, so UP = negative Y in their system
+                    // But data.vector.y is already normalized where UP = positive
+                    // However, based on user feedback, we need to invert
+                    if (y > threshold) moveBackward = true;  // Joystick pushed down (screen down = y positive in nipple)
+                    if (y < -threshold) moveForward = true;  // Joystick pushed up (screen up = y negative in nipple)
+                    if (x > threshold) moveRight = true;
+                    if (x < -threshold) moveLeft = true;
                 });
 
                 joystickManager.on('end', function () {
-                    moveForward = false; moveBackward = false; moveLeft = false; moveRight = false;
+                    moveForward = false;
+                    moveBackward = false;
+                    moveLeft = false;
+                    moveRight = false;
                 });
 
-                // 2. Touch Look (Right side of screen)
+                // 2. Touch Look (Right side) - with touch identifier for multi-touch
                 const lookZone = document.getElementById('look-zone');
+                let lookTouchId = null;
                 let lastTouchX = 0;
                 let lastTouchY = 0;
 
                 lookZone.addEventListener('touchstart', (e) => {
-                    lastTouchX = e.touches[0].clientX;
-                    lastTouchY = e.touches[0].clientY;
-                }, { passive: false });
+                    // Only track if we don't have an active look touch
+                    if (lookTouchId === null) {
+                        const touch = e.changedTouches[0];
+                        lookTouchId = touch.identifier;
+                        lastTouchX = touch.clientX;
+                        lastTouchY = touch.clientY;
+                    }
+                }, { passive: true });
 
                 lookZone.addEventListener('touchmove', (e) => {
-                    e.preventDefault(); // Prevent scrolling
-                    const touchX = e.touches[0].clientX;
-                    const touchY = e.touches[0].clientY;
+                    e.preventDefault();
 
-                    const deltaX = touchX - lastTouchX;
-                    const deltaY = touchY - lastTouchY;
+                    // Find our tracked touch
+                    for (let i = 0; i < e.changedTouches.length; i++) {
+                        const touch = e.changedTouches[i];
+                        if (touch.identifier === lookTouchId) {
+                            const touchX = touch.clientX;
+                            const touchY = touch.clientY;
 
-                    // Adjust sensitivity as needed
-                    const sensitivity = 0.003;
-                    camera.rotation.y -= deltaX * sensitivity; // Left/Right (drag left = look left)
-                    camera.rotation.x -= deltaY * sensitivity; // FIXED: drag up = look up (inverted)
+                            const deltaX = touchX - lastTouchX;
+                            const deltaY = touchY - lastTouchY;
 
-                    // Clamp look up/down to reasonable range
-                    camera.rotation.x = Math.max(-Math.PI / 3, Math.min(Math.PI / 3, camera.rotation.x));
+                            // Adjust sensitivity
+                            const sensitivity = 0.004;
+                            camera.rotation.y -= deltaX * sensitivity; // Left/Right
+                            camera.rotation.x -= deltaY * sensitivity; // Up/Down (drag up = look up)
 
-                    lastTouchX = touchX;
-                    lastTouchY = touchY;
+                            // Clamp pitch
+                            camera.rotation.x = Math.max(-Math.PI / 3, Math.min(Math.PI / 3, camera.rotation.x));
+
+                            lastTouchX = touchX;
+                            lastTouchY = touchY;
+                            break;
+                        }
+                    }
                 }, { passive: false });
+
+                lookZone.addEventListener('touchend', (e) => {
+                    for (let i = 0; i < e.changedTouches.length; i++) {
+                        if (e.changedTouches[i].identifier === lookTouchId) {
+                            lookTouchId = null;
+                            break;
+                        }
+                    }
+                }, { passive: true });
+
+                lookZone.addEventListener('touchcancel', (e) => {
+                    for (let i = 0; i < e.changedTouches.length; i++) {
+                        if (e.changedTouches[i].identifier === lookTouchId) {
+                            lookTouchId = null;
+                            break;
+                        }
+                    }
+                }, { passive: true });
 
                 // 3. Actions
                 const interactBtn = document.getElementById('interact-btn');
