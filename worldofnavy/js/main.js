@@ -660,8 +660,13 @@ class Game {
             if (x < -threshold) this.input.keys.left = true;
         });
 
-        // Ensure END event clears everything reliably
+        // Joystick Events
+        manager.on('start', () => {
+            this.isJoystickActive = true;
+        });
+
         manager.on('end', () => {
+            this.isJoystickActive = false;
             this.input.keys.forward = false;
             this.input.keys.backward = false;
             this.input.keys.left = false;
@@ -679,8 +684,8 @@ class Game {
         let isPinching = false;
 
         lookZone.addEventListener('touchstart', (e) => {
-            // Handle Zoom (2 fingers)
-            if (e.touches.length === 2) {
+            // Handle Zoom (2 fingers) -> ONLY if Joystick is NOT active
+            if (e.touches.length === 2 && !this.isJoystickActive) {
                 isPinching = true;
                 const dx = e.touches[0].clientX - e.touches[1].clientX;
                 const dy = e.touches[0].clientY - e.touches[1].clientY;
@@ -700,8 +705,8 @@ class Game {
         lookZone.addEventListener('touchmove', (e) => {
             e.preventDefault();
 
-            // Zoom Logic
-            if (isPinching && e.touches.length === 2) {
+            // Zoom Logic -> ONLY if Joystick is NOT active
+            if (isPinching && e.touches.length === 2 && !this.isJoystickActive) {
                 const dx = e.touches[0].clientX - e.touches[1].clientX;
                 const dy = e.touches[0].clientY - e.touches[1].clientY;
                 const dist = Math.hypot(dx, dy);
