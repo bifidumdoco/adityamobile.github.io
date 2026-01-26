@@ -1665,12 +1665,18 @@
                 document.getElementById('modal-overlay').classList.add('active');
                 isModalOpen = true;
                 controls.unlock();
+                // Hide mobile controls when modal is open
+                const mobileControls = document.getElementById('mobile-controls');
+                if (mobileControls) mobileControls.style.display = 'none';
             }
 
             function closeModal() {
                 document.getElementById('modal-overlay').classList.remove('active');
                 isModalOpen = false;
                 controls.lock();
+                // Show mobile controls when modal is closed
+                const mobileControls = document.getElementById('mobile-controls');
+                if (mobileControls) mobileControls.style.display = 'block';
             }
 
             document.getElementById('close-btn').addEventListener('click', closeModal);
