@@ -618,44 +618,31 @@ class Game {
         }
     }
 
-    setupMobileControls() {
-        // Just init logic, show it in startGame
-        this.isMobile = true;
+    initJoystick() {
+        if (this.joystickManager) {
+            this.joystickManager.destroy();
+        }
 
-        // 1. Joystick (Static mode so it's always visible)
-        // Ensure nipplejs is available (loaded via script tag in index.html)
-        const manager = nipplejs.create({
+        this.joystickManager = nipplejs.create({
             zone: document.getElementById('joystick-zone'),
             mode: 'static',
             position: { left: '50%', top: '50%' },
             color: 'white',
             size: 100,
-            threshold: 0.1 // More sensitive start
+            threshold: 0.1
         });
 
-        // Use proven data handling from Westcoast
-        manager.on('move', (evt, data) => {
+        this.joystickManager.on('move', (evt, data) => {
             if (!data.vector) return;
-
-            // Get normalized values (-1 to 1)
             const x = data.vector.x;
             const y = data.vector.y;
 
-            // Reset all first
             this.input.keys.forward = false;
             this.input.keys.backward = false;
             this.input.keys.left = false;
             this.input.keys.right = false;
 
-            // Threshold for activation (match Westcoast)
             const threshold = 0.3;
-
-            // Direction Logic (Verified from Westcoast usage)
-            // In nipplejs 'static'/'dynamic':
-            // y > threshold => Pushed UP (Forward)
-            // y < -threshold => Pushed DOWN (Backward)
-            // x > threshold => Pushed RIGHT
-            // x < -threshold => Pushed LEFT
 
             if (y > threshold) this.input.keys.forward = true;
             if (y < -threshold) this.input.keys.backward = true;
@@ -663,18 +650,25 @@ class Game {
             if (x < -threshold) this.input.keys.left = true;
         });
 
-        // Joystick Events
-        manager.on('start', () => {
+        this.joystickManager.on('start', () => {
             this.isJoystickActive = true;
         });
 
-        manager.on('end', () => {
+        this.joystickManager.on('end', () => {
             this.isJoystickActive = false;
             this.input.keys.forward = false;
             this.input.keys.backward = false;
             this.input.keys.left = false;
             this.input.keys.right = false;
         });
+    }
+
+    setupMobileControls() {
+        // Just init logic, show it in startGame
+        this.isMobile = true;
+
+        // 1. Joystick (Static mode so it's always visible)
+        this.initJoystick();
 
         // 2. Look (Touch Drag) & Zoom (Pinch)
         const lookZone = document.getElementById('look-zone');
@@ -788,6 +782,11 @@ class Game {
             this.camera.aspect = window.innerWidth / window.innerHeight;
             this.camera.updateProjectionMatrix();
             this.renderer.setSize(window.innerWidth, window.innerHeight);
+
+            // Re-init joystick if mobile to fix orientation issues
+            if (this.isMobile) {
+                this.initJoystick();
+            }
         }
     }
 }
