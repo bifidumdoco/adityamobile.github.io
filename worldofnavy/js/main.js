@@ -668,13 +668,27 @@ class Game {
             this.input.keys.right = false;
         });
 
-        // 2. Look (Touch Drag) - with touch identifier for multi-touch
+        // 2. Look (Touch Drag) & Zoom (Pinch)
         const lookZone = document.getElementById('look-zone');
         let lookTouchId = null;
         let lastX = 0;
         let lastY = 0;
 
+        // Zoom State
+        let pinchStartDist = 0;
+        let isPinching = false;
+
         lookZone.addEventListener('touchstart', (e) => {
+            // Handle Zoom (2 fingers)
+            if (e.touches.length === 2) {
+                isPinching = true;
+                const dx = e.touches[0].clientX - e.touches[1].clientX;
+                const dy = e.touches[0].clientY - e.touches[1].clientY;
+                pinchStartDist = Math.hypot(dx, dy);
+                return;
+            }
+
+            // Handle Look (1 finger)
             if (lookTouchId === null) {
                 const touch = e.changedTouches[0];
                 lookTouchId = touch.identifier;
@@ -686,6 +700,26 @@ class Game {
         lookZone.addEventListener('touchmove', (e) => {
             e.preventDefault();
 
+            // Zoom Logic
+            if (isPinching && e.touches.length === 2) {
+                const dx = e.touches[0].clientX - e.touches[1].clientX;
+                const dy = e.touches[0].clientY - e.touches[1].clientY;
+                const dist = Math.hypot(dx, dy);
+
+                // Calculate delta
+                const diff = dist - pinchStartDist;
+
+                // Update start dist for next frame (relative movement)
+                pinchStartDist = dist;
+
+                // Map to scrollDelta
+                // Spread = diff positive -> Zoom IN -> decrease distance -> scrollDelta negative
+                // Sensitivity adjustment (e.g. -5 to make it noticeable)
+                this.input.scrollDelta -= diff * 5;
+                return;
+            }
+
+            // Look Logic
             for (let i = 0; i < e.changedTouches.length; i++) {
                 const touch = e.changedTouches[i];
                 if (touch.identifier === lookTouchId) {
@@ -704,6 +738,11 @@ class Game {
         }, { passive: false });
 
         lookZone.addEventListener('touchend', (e) => {
+            // Check if pinch ending
+            if (isPinching && e.touches.length < 2) {
+                isPinching = false;
+            }
+
             for (let i = 0; i < e.changedTouches.length; i++) {
                 if (e.changedTouches[i].identifier === lookTouchId) {
                     lookTouchId = null;
@@ -713,6 +752,7 @@ class Game {
         }, { passive: true });
 
         lookZone.addEventListener('touchcancel', (e) => {
+            isPinching = false;
             for (let i = 0; i < e.changedTouches.length; i++) {
                 if (e.changedTouches[i].identifier === lookTouchId) {
                     lookTouchId = null;
