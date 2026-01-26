@@ -626,9 +626,11 @@ class Game {
             mode: 'static',
             position: { left: '50%', top: '50%' },
             color: 'white',
-            size: 100
+            size: 100,
+            threshold: 0.1 // More sensitive start
         });
 
+        // Use proven data handling from Westcoast
         manager.on('move', (evt, data) => {
             if (!data.vector) return;
 
@@ -636,23 +638,29 @@ class Game {
             const x = data.vector.x;
             const y = data.vector.y;
 
-            // Reset all
+            // Reset all first
             this.input.keys.forward = false;
             this.input.keys.backward = false;
             this.input.keys.left = false;
             this.input.keys.right = false;
 
-            // Threshold for activation
+            // Threshold for activation (match Westcoast)
             const threshold = 0.3;
 
-            // Enable ALL directions
-            // nipplejs: positive y = nipple pushed UP, negative y = nipple pushed DOWN
-            if (y > threshold) this.input.keys.forward = true;   // UP = forward
-            if (y < -threshold) this.input.keys.backward = true; // DOWN = backward
+            // Direction Logic (Verified from Westcoast usage)
+            // In nipplejs 'static'/'dynamic':
+            // y > threshold => Pushed UP (Forward)
+            // y < -threshold => Pushed DOWN (Backward)
+            // x > threshold => Pushed RIGHT
+            // x < -threshold => Pushed LEFT
+
+            if (y > threshold) this.input.keys.forward = true;
+            if (y < -threshold) this.input.keys.backward = true;
             if (x > threshold) this.input.keys.right = true;
             if (x < -threshold) this.input.keys.left = true;
         });
 
+        // Ensure END event clears everything reliably
         manager.on('end', () => {
             this.input.keys.forward = false;
             this.input.keys.backward = false;
