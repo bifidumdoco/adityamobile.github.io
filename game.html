@@ -799,12 +799,10 @@
                     // Threshold for activation
                     const threshold = 0.3;
 
-                    // Enable ALL 4 directions (can combine for diagonal)
-                    // Y-axis: nipplejs uses screen coords, so UP = negative Y in their system
-                    // But data.vector.y is already normalized where UP = positive
-                    // However, based on user feedback, we need to invert
-                    if (y > threshold) moveBackward = true;  // Joystick pushed down (screen down = y positive in nipple)
-                    if (y < -threshold) moveForward = true;  // Joystick pushed up (screen up = y negative in nipple)
+                    // Enable ALL 4 directions
+                    // nipplejs: positive y = nipple pushed UP, negative y = nipple pushed DOWN
+                    if (y > threshold) moveForward = true;   // Joystick pushed UP = forward
+                    if (y < -threshold) moveBackward = true; // Joystick pushed DOWN = backward
                     if (x > threshold) moveRight = true;
                     if (x < -threshold) moveLeft = true;
                 });
@@ -823,6 +821,9 @@
                 let lastTouchY = 0;
 
                 lookZone.addEventListener('touchstart', (e) => {
+                    // Don't track look when modal is open
+                    if (isModalOpen) return;
+
                     // Only track if we don't have an active look touch
                     if (lookTouchId === null) {
                         const touch = e.changedTouches[0];

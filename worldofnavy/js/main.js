@@ -652,9 +652,9 @@ class Game {
             const threshold = 0.3;
 
             // Enable ALL directions
-            // nipplejs: y positive = down on screen, y negative = up on screen
-            if (y > threshold) this.input.keys.backward = true;
-            if (y < -threshold) this.input.keys.forward = true;
+            // nipplejs: positive y = nipple pushed UP, negative y = nipple pushed DOWN
+            if (y > threshold) this.input.keys.forward = true;   // UP = forward
+            if (y < -threshold) this.input.keys.backward = true; // DOWN = backward
             if (x > threshold) this.input.keys.right = true;
             if (x < -threshold) this.input.keys.left = true;
         });
