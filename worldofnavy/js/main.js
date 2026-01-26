@@ -260,6 +260,9 @@ class Game {
         if (this.listener) {
             this.camera.add(this.listener);
         }
+
+        // FORCE RESIZE: Ensure the canvas matches the current dimensions (e.g. if user rotated during menu)
+        this.onWindowResize();
     }
 
     spawnShips() {
