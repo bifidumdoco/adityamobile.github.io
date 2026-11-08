@@ -1,0 +1,9 @@
+﻿{
+    "redirects":  [
+                      {
+                          "destination":  "https://adityaanamta.vercel.app/mobile.html",
+                          "permanent":  false,
+                          "source":  "/(.*)"
+                      }
+                  ]
+}
